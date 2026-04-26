@@ -67,6 +67,7 @@ games = pd.read_csv(DATA_ROOT / "games.csv")
 # player_play = pd.read_csv(DATA_ROOT / "player_play.csv")
 players = pd.read_csv(DATA_ROOT / "players.csv")
 plays = pd.read_csv(DATA_ROOT / "plays.csv")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 all_weeks = []
 
