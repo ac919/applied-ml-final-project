@@ -1,32 +1,25 @@
 import pandas as pd
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import math
 from pathlib import Path
 import torch
 from torch.utils.data import TensorDataset
-from torch.utils.data import DataLoader
-from data_cleaning import rotate_direction_and_orientation, make_plays_left_to_right, calculate_velocity_components, pass_attempt_merging, label_offense_defense_manzone, select_augmented_frames, data_augmentation, prepare_frame_data
+from data_cleaning import rotate_direction_and_orientation, make_plays_left_to_right, calculate_velocity_components, pass_attempt_merging, label_offense_defense_manzone, label_offense_defense_coverage, select_augmented_frames, data_augmentation, prepare_frame_data
 
 DATA_ROOT = Path(__file__).resolve().parent.parent / "bdb-data-raw"
 TENSORS_DIR = Path(__file__).resolve().parent.parent / "tensors"
 
 def process_week_data(week_number, plays):
-
-  # -- defining function to read in all data & apply cleaning functions
-
   file_path = DATA_ROOT / f"week{week_number}.csv"
   week = pd.read_csv(file_path)
   print(f"Finished reading Week {week_number} data")
 
-  # applying cleaning functions
+  # Data cleaning functions
   week = rotate_direction_and_orientation(week)
   week = make_plays_left_to_right(week)
   week = calculate_velocity_components(week)
   week = pass_attempt_merging(week, plays)
-  # week = label_offense_defense_coverage(week, plays)  # for specific coverage... currently set to man/zone only
-  week = label_offense_defense_manzone(week, plays)
+  week = label_offense_defense_coverage(week, plays)  # for specific coverages, not just man/zone
+  # week = label_offense_defense_manzone(week, plays)
 
   week['week'] = week_number
   week['uniqueId'] = week['gameId'].astype(str) + "_" + week['playId'].astype(str)
@@ -35,7 +28,7 @@ def process_week_data(week_number, plays):
       week['playId'].astype(str) + "_" +
       week['frameId'].astype(str))
 
-  # adding frames_from_snap (to do: make this a function but fine for now)
+  # adding frames_from_snap 
   snap_frames = week[week['event'] == 'ball_snap'].groupby('uniqueId')['frameId'].first()
   week = week.merge(snap_frames.rename('snap_frame'), on='uniqueId', how='left')
   week['frames_from_snap'] = week['frameId'] - week['snap_frame']
@@ -81,8 +74,8 @@ all_tracking = all_tracking[(all_tracking['team'] != 'football') & (all_tracking
 # --- takes ~10mins to run
 
 features = ["x_clean", "y_clean", "v_x", "v_y", "defense"]
-target_column = "pff_passCoverageType"
-# -- target_column = "pff_passCoverage"
+# target_column = "pff_passCoverageType"
+target_column = "pff_passCoverage"
 
 # looping through weeks & saving each week's training data + validating data
 for week_eval in range(1, 9):
@@ -90,8 +83,8 @@ for week_eval in range(1, 9):
   train_df = all_tracking[all_tracking['week'] != week_eval]
   val_df = all_tracking[all_tracking['week'] == week_eval]
 
-  train_df = train_df[['frameUniqueId', 'frameId', 'event', 'x_clean', 'y_clean', 'v_x', 'v_y', 'defensiveTeam', 'pff_passCoverageType','defense']]
-  val_df = val_df[['frameUniqueId', 'frameId', 'event', 'x_clean', 'y_clean', 'v_x', 'v_y', 'defensiveTeam', 'pff_passCoverageType', 'defense']]
+  train_df = train_df[['frameUniqueId', 'frameId', 'event', 'x_clean', 'y_clean', 'v_x', 'v_y', 'defensiveTeam', 'pff_passCoverage','defense']]
+  val_df = val_df[['frameUniqueId', 'frameId', 'event', 'x_clean', 'y_clean', 'v_x', 'v_y', 'defensiveTeam', 'pff_passCoverage', 'defense']]
 
   train_features, train_targets = prepare_frame_data(train_df, features, target_column)
   val_features, val_targets = prepare_frame_data(val_df, features, target_column)
@@ -102,10 +95,7 @@ for week_eval in range(1, 9):
   print(f"Week {week_eval} Tensor: {train_features.shape}") # should be: torch.Size([X, 22, 5]) where X is num frames, 22 is num plays, 5 is num features (as definied above)
   print(f"Week {week_eval} Indiv Check: {train_features[63][0]}") # should be: tensor([x_cord, y_cord, v_x,  v_y,  1/0])
 
-  # prints the same train_features[63][0] which doesn't give much context to potential errors... to do: change to random
-
   torch.save(train_features, TENSORS_DIR / f"features_training_week{week_eval}preds.pt")
   torch.save(train_targets, TENSORS_DIR / f"targets_training_week{week_eval}preds.pt")
-
   torch.save(val_features, TENSORS_DIR / f"features_val_week{week_eval}preds.pt")
   torch.save(val_targets, TENSORS_DIR / f"targets_val_week{week_eval}preds.pt")

@@ -59,15 +59,10 @@ class ManZoneTransformer(nn.Module):
         return x
 
 
-def load_all_week_tensors(tensors_dir: Path):
-    features = []
-    targets = []
-
-    for week in range(1, 9):
-        features.append(torch.load(tensors_dir / f"features_val_week{week}preds.pt"))
-        targets.append(torch.load(tensors_dir / f"targets_val_week{week}preds.pt"))
-
-    return torch.cat(features, dim=0), torch.cat(targets, dim=0)
+def load_eval_tensors(tensors_dir: Path, week_eval: int = 8):
+    features = torch.load(tensors_dir / f"features_val_week{week_eval}preds.pt")
+    targets = torch.load(tensors_dir / f"targets_val_week{week_eval}preds.pt")
+    return features, targets
 
 
 def main():
@@ -82,7 +77,8 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    features_all, targets_all = load_all_week_tensors(tensors_dir)
+    week_eval = 8
+    features_all, targets_all = load_eval_tensors(tensors_dir, week_eval)
     eval_loader = DataLoader(
         TensorDataset(features_all, targets_all), batch_size=256, shuffle=False
     )
@@ -118,7 +114,7 @@ def main():
 
     accuracy = sum(int(p == t) for p, t in zip(all_preds, all_targets)) / len(all_targets)
 
-    print("Evaluation set: concatenated weeks 1-8 tensors")
+    print(f"Evaluation set: week {week_eval} val tensors (trained on weeks 1-7)")
     print(f"Num samples: {len(all_targets)}")
     print(f"Accuracy: {accuracy:.4f}\n")
 
