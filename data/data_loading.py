@@ -81,8 +81,8 @@ for week_eval in range(1, 9):
   train_dataset = TensorDataset(train_features, train_targets['pff_passCoverage'], train_targets['pff_passCoverageType'])
   val_dataset = TensorDataset(val_features, val_targets['pff_passCoverage'], val_targets['pff_passCoverageType'])
 
-  print(f"Week {week_eval} Tensor: {train_features.shape}") # should be: torch.Size([X, 22, 5]) where X is num frames, 22 is num plays, 5 is num features (as definied above)
-  print(f"Week {week_eval} Indiv Check: {train_features[63][0]}") # should be: tensor([x_cord, y_cord, v_x,  v_y,  1/0])
+  print(f"Week {week_eval} Tensor: {train_features.shape}") 
+  print(f"Week {week_eval} Indiv Check: {train_features[63][0]}") 
 
   torch.save(train_features, TENSORS_DIR / f"features_training_week{week_eval}preds.pt")
   torch.save(val_features, TENSORS_DIR / f"features_val_week{week_eval}preds.pt")

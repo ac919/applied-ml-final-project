@@ -43,7 +43,7 @@ class ManZoneTransformer(nn.Module):
   
 
 class CoverageTransformer(nn.Module):
-    def __init__(self, feature_len=5, model_dim=64, num_heads=2, num_layers=4, dim_feedforward=256, dropout=0.1, output_dim=7):
+    def __init__(self, feature_len=5, model_dim=128, num_heads=4, num_layers=4, dim_feedforward=512, dropout=0.2, output_dim=7):
         super(CoverageTransformer, self).__init__()
         self.feature_norm_layer = nn.BatchNorm1d(feature_len)
 
