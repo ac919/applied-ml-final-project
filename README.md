@@ -1,14 +1,14 @@
 # Predicting NFL Defense Pass Coverage Based On Presnap Alignment
-Using transformer models to predict what pass coverage an NFL defense is in on a particular play based on presnap player tracking data
+Using transformer models to predict what pass coverage an NFL defense is in on a particular play based on presnap player tracking data. 
 
 ## What it Does
+Before the ball is snapped and a play begins, offenses and defenses are in an elaborate cat and mouse game each trying to figure out what the other is about to do. Based on things like personnel (which players are on the field), formation (how the players are lined up), and presnap movement, it is possible to identify tells that can reveal what a defense may be about to do. This project, which is inspired by a 2025 NFL Big Data Bowl submission, uses transformers to predict what coverage an NFL defense is in based on player tracking data recorded from thousands of frames of presnap video, as well as labeled postsnap coverage data. 
 
 
 ## Quick Start
-- make sure requirements.txt are satisfied
-- load/prep the data by running data_loading.py
-- train the 2 different classifier models by running man_zone_transformer.py and coverage_classifier_transformer.py
-- evaluate the models using man_zone_eval.py & coverage_classifier_eval.py
+- prerequisites: check that requirements.txt are satisfied
+- use git lfs to pull the data
+- run `run.ipynb` which calls all the necessary data processing, model training, and evaluation scripts
 
 ## Video Links
 

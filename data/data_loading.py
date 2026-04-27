@@ -32,7 +32,7 @@ def process_week_data(week_number, plays):
   week = week.merge(snap_frames.rename('snap_frame'), on='uniqueId', how='left')
   week['frames_from_snap'] = week['frameId'] - week['snap_frame']
   week = week[week['frameId'] % 2 == 0]
-  week = week[(week['frames_from_snap'] >= -150) & (week['frames_from_snap'] <= 50)]
+  week = week[(week['frames_from_snap'] >= -150) & (week['frames_from_snap'] < 0)]
 
   num_unique_frames = len(set(week['frameUniqueId']))
   selected_frames = select_augmented_frames(week, int(num_unique_frames / 3), sigma=5)
