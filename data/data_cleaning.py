@@ -115,6 +115,59 @@ def label_offense_defense_coverage(presnap_df, plays_df):
 
   return merged_df
 
+
+def label_offense_defense_multitask(presnap_df, plays_df):
+
+  coverage_replacements = {
+    'Cover-3 Cloud Right': 'Cover-3',
+    'Cover-3 Cloud Left': 'Cover-3',
+    'Cover-3 Seam': 'Cover-3',
+    'Cover-3 Double Cloud': 'Cover-3',
+    'Cover-6 Right': 'Cover-6',
+    'Cover 6-Left': 'Cover-6',
+    'Cover-1 Double': 'Cover-1'
+  }
+
+  coverage_values_to_drop = ["Miscellaneous", "Bracket", "Prevent", "Red Zone", "Goal Line"]
+
+  coverage_mapping = {
+      'Cover-0': 0,
+      'Cover-1': 1,
+      'Cover-2': 2,
+      'Cover-3': 3,
+      'Quarters': 4,
+      '2-Man': 5,
+      'Cover-6': 6
+  }
+
+  manzone_mapping = {
+      'Zone': 0,
+      'Man': 1
+  }
+
+  plays_for_labels = plays_df.copy()
+  plays_for_labels['pff_passCoverage'] = plays_for_labels['pff_passCoverage'].replace(coverage_replacements)
+  plays_for_labels = plays_for_labels[~plays_for_labels['pff_passCoverage'].isin(coverage_values_to_drop)]
+
+  merged_df = presnap_df.merge(
+      plays_for_labels[
+          ['gameId', 'playId', 'possessionTeam', 'defensiveTeam', 'pff_passCoverage', 'pff_passCoverageType']
+      ],
+      on=['gameId', 'playId'],
+      how='left'
+  )
+
+  merged_df['defense'] = ((merged_df['team'] == merged_df['defensiveTeam']) & (merged_df['team'] != 'football')).astype(int)
+
+  merged_df['pff_passCoverage'] = merged_df['pff_passCoverage'].map(coverage_mapping)
+  merged_df['pff_passCoverageType'] = merged_df['pff_passCoverageType'].map(manzone_mapping)
+  merged_df.dropna(subset=['pff_passCoverage', 'pff_passCoverageType'], inplace=True)
+
+  merged_df['pff_passCoverage'] = merged_df['pff_passCoverage'].astype(int)
+  merged_df['pff_passCoverageType'] = merged_df['pff_passCoverageType'].astype(int)
+
+  return merged_df
+
 def label_offense_defense_manzone(presnap_df, plays_df):
 
   plays_df = plays_df.dropna(subset=['pff_passCoverageType'])
@@ -247,6 +300,30 @@ def prepare_frame_data(df, features, target_column):
     targets_tensor = torch.tensor(np.asarray(target_values), dtype=torch.long)
 
     return features_tensor, targets_tensor
+
+
+def prepare_frame_multitask_data(df, features, target_columns):
+    grouped = df.groupby("frameUniqueId", sort=False)
+    feature_batches = []
+    target_values = {target_column: [] for target_column in target_columns}
+
+    for _, group in grouped:
+        feature_batches.append(group[features].to_numpy(dtype=np.float32))
+        for target_column in target_columns:
+            target_values[target_column].append(group[target_column].iloc[0])
+
+    try:
+        features_tensor = torch.tensor(np.stack(feature_batches), dtype=torch.float32)
+    except ValueError as e:
+        print("Skipping batch due to inconsistent shapes in feature batches:", e)
+        return None, None
+
+    targets_tensors = {
+        target_column: torch.tensor(np.asarray(values), dtype=torch.long)
+        for target_column, values in target_values.items()
+    }
+
+    return features_tensor, targets_tensors
 
 
 def select_augmented_frames(df, num_samples, sigma=5):

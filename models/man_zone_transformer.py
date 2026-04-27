@@ -4,65 +4,23 @@ from torch.utils.data import TensorDataset, DataLoader
 import pandas as pd
 from pathlib import Path
 pd.options.mode.chained_assignment = None
+from transformer_models import ManZoneTransformer
 
-class ManZoneTransformer(nn.Module):
-  def __init__(self, feature_len=5, model_dim=64, num_heads=2, num_layers=4, dim_feedforward=256, dropout=0.1, output_dim=2):
-      super(ManZoneTransformer, self).__init__()
-      self.feature_norm_layer = nn.BatchNorm1d(feature_len)
-
-      self.feature_embedding_layer = nn.Sequential(
-          nn.Linear(feature_len, model_dim),
-          nn.ReLU(),
-          nn.LayerNorm(model_dim),
-          nn.Dropout(dropout),
-      )
-
-      transformer_encoder_layer = nn.TransformerEncoderLayer(
-          d_model=model_dim,
-          nhead=num_heads,
-          dim_feedforward=dim_feedforward,
-          dropout=dropout,
-          batch_first=True,
-      )
-      self.transformer_encoder = nn.TransformerEncoder(transformer_encoder_layer, num_layers=num_layers)
-
-      self.player_pooling_layer = nn.AdaptiveAvgPool1d(1)
-
-      self.decoder = nn.Sequential(
-          nn.Linear(model_dim, model_dim),
-          nn.ReLU(),
-          nn.Dropout(dropout),
-          nn.Linear(model_dim, model_dim // 4),
-          nn.ReLU(),
-          nn.LayerNorm(model_dim // 4),
-          nn.Linear(model_dim // 4, output_dim),
-      )
-
-  def forward(self, x):
-      # x shape: (batch_size, num_players, feature_len)
-      x = self.feature_norm_layer(x.permute(0, 2, 1)).permute(0, 2, 1)
-      x = self.feature_embedding_layer(x)
-      x = self.transformer_encoder(x)
-      x = self.player_pooling_layer(x.permute(0, 2, 1)).squeeze(-1)
-      x = self.decoder(x)
-      return x
-  
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TENSORS_DIR = PROJECT_ROOT / "tensors"
 MODELS_DIR = PROJECT_ROOT / "models" 
-MODELS_DIR.mkdir(parents=True, exist_ok=True)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 batch_size = 64
 learning_rate = 1e-3
 
 week_eval = 8  # train on weeks 1-7, validate on week 8
 train_features = torch.load(TENSORS_DIR / f"features_training_week{week_eval}preds.pt", map_location=device)
-train_targets = torch.load(TENSORS_DIR / f"targets_training_week{week_eval}preds.pt", map_location=device)
+train_targets = torch.load(TENSORS_DIR / f"targets_training_manzone_week{week_eval}preds.pt", map_location=device)
 val_features = torch.load(TENSORS_DIR / f"features_val_week{week_eval}preds.pt", map_location=device)
-val_targets = torch.load(TENSORS_DIR / f"targets_val_week{week_eval}preds.pt", map_location=device)
+val_targets = torch.load(TENSORS_DIR / f"targets_val_manzone_week{week_eval}preds.pt", map_location=device)
 
 print(f"Train samples: {train_features.size(0)}, Val samples: {val_features.size(0)}")
 
@@ -72,7 +30,6 @@ val_dataset = TensorDataset(val_features, val_targets)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
-# One model only.
 model = ManZoneTransformer(
     feature_len=5,
     model_dim=64,
