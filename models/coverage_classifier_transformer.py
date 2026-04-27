@@ -85,9 +85,9 @@ val_loader = DataLoader(TensorDataset(val_features, val_targets), batch_size=bat
 model = CoverageTransformer(
     feature_len=5,
     model_dim=64,
-    num_heads=2,
+    num_heads=4,
     num_layers=4,
-    dim_feedforward=64 * 4,
+    dim_feedforward=256,
     dropout=0.1,
     output_dim=NUM_CLASSES
 ).to(device)

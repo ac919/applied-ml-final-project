@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import TensorDataset
 from data_cleaning import rotate_direction_and_orientation, make_plays_left_to_right, calculate_velocity_components, pass_attempt_merging, label_offense_defense_manzone, label_offense_defense_coverage, select_augmented_frames, data_augmentation, prepare_frame_data
 
-DATA_ROOT = Path(__file__).resolve().parent.parent / "bdb-data-raw"
+DATA_ROOT = Path(__file__).resolve().parent.parent / "data"
 TENSORS_DIR = Path(__file__).resolve().parent.parent / "tensors"
 
 def process_week_data(week_number, plays):
