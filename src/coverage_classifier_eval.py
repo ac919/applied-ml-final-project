@@ -1,8 +1,15 @@
 from pathlib import Path
+import sys
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import classification_report, confusion_matrix
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODELS_DIR = PROJECT_ROOT / "models"
+if str(MODELS_DIR) not in sys.path:
+    sys.path.insert(0, str(MODELS_DIR))
+
 from transformer_models import CoverageTransformer
 
 COVERAGE_MAPPING = {
@@ -18,9 +25,8 @@ CLASS_NAMES = list(COVERAGE_MAPPING.keys())
 
 
 def main():
-    project_root = Path(__file__).resolve().parent.parent
-    tensors_dir = project_root / "tensors"
-    checkpoint_path = project_root / "models" / "best_model_coverage.pth"
+    tensors_dir = PROJECT_ROOT / "tensors"
+    checkpoint_path = PROJECT_ROOT / "models" / "best_model_coverage.pth"
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(

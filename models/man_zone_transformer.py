@@ -46,7 +46,7 @@ loss_fn = nn.CrossEntropyLoss()
 early_stopping_patience = 5
 best_val_loss = float("inf")
 epochs_no_improve = 0
-num_epochs = 25
+num_epochs = 50
 
 train_losses = []
 val_losses = []

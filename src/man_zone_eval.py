@@ -1,8 +1,15 @@
 from pathlib import Path
+import sys
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODELS_DIR = PROJECT_ROOT / "models"
+if str(MODELS_DIR) not in sys.path:
+    sys.path.insert(0, str(MODELS_DIR))
+
 from transformer_models import ManZoneTransformer
 
 
@@ -13,9 +20,8 @@ def load_eval_tensors(tensors_dir: Path, week_eval: int = 8):
 
 
 def main():
-    project_root = Path(__file__).resolve().parent.parent
-    tensors_dir = project_root / "tensors"
-    checkpoint_path = project_root / "models" / "best_model_all_weeks.pth"
+    tensors_dir = PROJECT_ROOT / "tensors"
+    checkpoint_path = PROJECT_ROOT / "models" / "best_model_all_weeks.pth"
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(
