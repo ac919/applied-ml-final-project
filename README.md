@@ -15,56 +15,58 @@ Before the ball is snapped and a play begins, offenses and defenses are in an el
 ## Evaluation
 **Model 1: Man vs Zone Coverage**
 
-Accuracy: 0.8757
+Accuracy: 0.8004
 
 |  | Precision | Recall | F1-Score |
 |---|---|---|---|
-| Zone | 0.91 | 0.91 | 0.91 |
-| Man | 0.81 | 0.79 | 0.80 |
+| Zone | 0.80 | 0.94 | 0.87 |
+| Man | 0.78 | 0.49 | 0.60 |
+
+AUC-ROC (Man=positive class): 0.8479
 
 **Confusion Matrix** (Rows=Actual, Cols=Predicted)
 
 |  | Predicted Zone | Predicted Man |
 |---|---|---|
-| **Actual Zone** | 14,913 | 1,403 |
-| **Actual Man** | 1,555 | 5,923 |
+| **Actual Zone** | 1,778 | 116 |
+| **Actual Man** | 431 | 415 |
 
 ---
 
 **Model 2: Multiclass Coverage Classifier**
 
-Accuracy: 0.7232
+Accuracy: 0.5500
 
 |  | Precision | Recall | F1-Score |
 |---|---|---|---|
-| Cover-0 | 0.79 | 0.70 | 0.74 |
-| Cover-1 | 0.72 | 0.78 | 0.75 |
-| Cover-2 | 0.75 | 0.76 | 0.76 |
-| Cover-3 | 0.75 | 0.78 | 0.77 |
-| Quarters | 0.66 | 0.58 | 0.62 |
-| 2-Man | 0.61 | 0.64 | 0.62 |
-| Cover-6 | 0.65 | 0.56 | 0.60 |
+| Cover-0 | 0.68 | 0.38 | 0.49 |
+| Cover-1 | 0.60 | 0.64 | 0.62 |
+| Cover-2 | 0.57 | 0.40 | 0.47 |
+| Cover-3 | 0.59 | 0.71 | 0.65 |
+| Quarters | 0.40 | 0.53 | 0.46 |
+| 2-Man | 0.43 | 0.17 | 0.24 |
+| Cover-6 | 0.41 | 0.21 | 0.28 |
 
 **Confusion Matrix** (Rows=Actual, Cols=Predicted)
 
 |  | Cover-0 | Cover-1 | Cover-2 | Cover-3 | Quarters | 2-Man | Cover-6 |
 |---|---|---|---|---|---|---|---|
-| **Cover-0** | 809 | 187 | 7 | 61 | 83 | 0 | 16 |
-| **Cover-1** | 139 | 4,515 | 96 | 758 | 153 | 78 | 48 |
-| **Cover-2** | 2 | 134 | 2,533 | 245 | 104 | 66 | 233 |
-| **Cover-3** | 31 | 1,137 | 151 | 5,946 | 243 | 14 | 92 |
-| **Quarters** | 35 | 113 | 142 | 644 | 1,756 | 21 | 311 |
-| **2-Man** | 0 | 61 | 89 | 1 | 3 | 322 | 26 |
-| **Cover-6** | 2 | 87 | 371 | 252 | 321 | 30 | 1,327 |
+| **Cover-0** | 50 | 39 | 2 | 21 | 20 | 0 | 0 |
+| **Cover-1** | 8 | 420 | 15 | 158 | 37 | 7 | 10 |
+| **Cover-2** | 1 | 49 | 150 | 103 | 37 | 1 | 36 |
+| **Cover-3** | 7 | 122 | 12 | 630 | 92 | 2 | 18 |
+| **Quarters** | 8 | 21 | 8 | 113 | 188 | 0 | 17 |
+| **2-Man** | 0 | 28 | 10 | 7 | 0 | 10 | 4 |
+| **Cover-6** | 0 | 18 | 65 | 37 | 97 | 3 | 59 |
 
 **Per-Class Accuracy:**
-- Cover-0: 809/1,163 (69.6%)
-- Cover-1: 4,515/5,787 (78.0%)
-- Cover-2: 2,533/3,317 (76.4%)
-- Cover-3: 5,946/7,614 (78.1%)
-- Quarters: 1,756/3,022 (58.1%)
-- 2-Man: 322/502 (64.1%)
-- Cover-6: 1,327/2,390 (55.5%)
+- Cover-0: 50/132 (37.9%)
+- Cover-1: 420/655 (64.1%)
+- Cover-2: 150/377 (39.8%)
+- Cover-3: 630/883 (71.3%)
+- Quarters: 188/355 (53.0%)
+- 2-Man: 10/59 (16.9%)
+- Cover-6: 59/279 (21.1%)
 
 
 
