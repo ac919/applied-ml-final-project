@@ -1,4 +1,4 @@
-# Predicting NFL Defense Pass Coverage Based On Presnap Alignment
+# Predicting NFL Defense Pass Coverage Based On Presnap Data
 Using transformer models to predict what pass coverage an NFL defense is in on a particular play based on presnap player tracking data. 
 
 ## What it Does
