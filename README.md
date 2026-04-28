@@ -11,6 +11,9 @@ Before the ball is snapped and a play begins, offenses and defenses are in an el
 - run `run.ipynb` which calls all the necessary data processing, model training, and evaluation scripts
 
 ## Video Links
+[Demo Link](https://duke.zoom.us/rec/share/kCYxtIbv9iPW9NDH4Y2Qksz1G3ZyF8jUnkUiaXh5FJt47u0JBmkr1jZrY-cfJigw.QPRhD0jSAwmpJ2l1?startTime=1777324478000)
+
+[Technical Walkthrough Link](https://duke.zoom.us/rec/share/SaNJEZV8z2vN04zbWD2S6YuskLyH7x-p7UHtyw1uuZTgULvD0wF8KKu1djP8yLFF.ThP-o1QzWnonWK9F?startTime=1777325938000)
 
 ## Evaluation
 Evaluation set: Week 8 validation tensors (2740 frames of data)
